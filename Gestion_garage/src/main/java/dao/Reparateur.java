@@ -3,24 +3,20 @@ package dao;
 import javax.persistence.*;
 
 @Entity
-@Table(name = "reparateur")
 public class Reparateur extends Utilisateur {
 
     private String telephone;
     private String specialite;
 
-    public Reparateur() {}
-
-    public Reparateur(String nom, String email, String password,
-                      String telephone, String specialite, Boutique boutique) {
-        this.nom = nom;
-        this.email = email;
-        this.password = password;
-        this.telephone = telephone;
-        this.specialite = specialite;
-        this.boutique = boutique;
-    }
+    @ManyToOne
+    private Boutique boutique;
 
     public String getTelephone() { return telephone; }
+    public void setTelephone(String telephone) { this.telephone = telephone; }
+
     public String getSpecialite() { return specialite; }
+    public void setSpecialite(String specialite) { this.specialite = specialite; }
+
+    public Boutique getBoutique() { return boutique; }
+    public void setBoutique(Boutique boutique) { this.boutique = boutique; }
 }

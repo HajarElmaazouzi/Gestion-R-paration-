@@ -3,15 +3,11 @@ package dao;
 import javax.persistence.*;
 
 @Entity
-@Table(name = "proprietaire")
 public class Proprietaire extends Utilisateur {
 
-    public Proprietaire() {}
+    @OneToOne
+    private Boutique boutique;
 
-    public Proprietaire(String nom, String email, String password, Boutique boutique) {
-        this.nom = nom;
-        this.email = email;
-        this.password = password;
-        this.boutique = boutique;
-    }
+    public Boutique getBoutique() { return boutique; }
+    public void setBoutique(Boutique boutique) { this.boutique = boutique; }
 }

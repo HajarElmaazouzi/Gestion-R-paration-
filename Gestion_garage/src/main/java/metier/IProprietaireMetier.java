@@ -1,8 +1,8 @@
 package metier;
 
+import dao.Proprietaire;
+
 public interface IProprietaireMetier {
-    void creerProprietaire(String nom,
-                           String email,
-                           String password,
-                           int boutiqueId);
+    Proprietaire login(String email, String password);
+    void creerProprietaire(String nom, String email, String password, int boutiqueId);
 }

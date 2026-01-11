@@ -14,12 +14,15 @@ public abstract class Utilisateur {
     protected String email;
     protected String password;
 
-    @ManyToOne
-    protected Boutique boutique;
-
     public int getId() { return id; }
+    public void setId(int id) { this.id = id; }
+
     public String getNom() { return nom; }
+    public void setNom(String nom) { this.nom = nom; }
+
     public String getEmail() { return email; }
+    public void setEmail(String email) { this.email = email; }
+
     public String getPassword() { return password; }
-    public Boutique getBoutique() { return boutique; }
+    public void setPassword(String password) { this.password = password; }
 }
