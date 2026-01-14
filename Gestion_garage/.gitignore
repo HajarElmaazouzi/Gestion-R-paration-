@@ -2,10 +2,10 @@
 /target/
 *.class
 
-# IDE files
-.classpath
-.project
-.settings/
+# IDE files (keeping Eclipse files for team collaboration)
+# .classpath  # Keep for Eclipse users
+# .project    # Keep for Eclipse users
+# .settings/  # Keep for Eclipse users
 .idea/
 *.iml
 *.iws
