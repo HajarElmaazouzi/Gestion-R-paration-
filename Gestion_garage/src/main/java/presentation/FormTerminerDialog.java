@@ -9,7 +9,6 @@ import exceptions.GestionException;
 public class FormTerminerDialog extends JDialog {
 
 	private static final long serialVersionUID = 1L;
-	private JTextArea txtPieces;
 	private JTextField txtCout;
 	private JTextField txtAvance;
 	private JTextField txtReste;
@@ -21,10 +20,11 @@ public class FormTerminerDialog extends JDialog {
 		this.reparation = reparation;
 		this.gestion = gestion;
 		
-		setSize(650, 700);
+		setSize(700, 600);
 		setLocationRelativeTo(mainWindow);
 		getContentPane().setBackground(new Color(240, 248, 255));
 		setLayout(new BorderLayout());
+		setResizable(false);
 		
 		// ========== HEADER AVEC GRADIENT ==========
 		JPanel headerPanel = new JPanel(null) {
@@ -40,7 +40,7 @@ public class FormTerminerDialog extends JDialog {
 			}
 		};
 		headerPanel.setOpaque(false);
-		headerPanel.setPreferredSize(new Dimension(650, 90));
+		headerPanel.setPreferredSize(new Dimension(700, 90));
 		
 		JLabel lblTitle = new JLabel("✅ Terminer Réparation");
 		lblTitle.setFont(new Font("Segoe UI", Font.BOLD, 26));
@@ -60,93 +60,116 @@ public class FormTerminerDialog extends JDialog {
 		JPanel mainPanel = new JPanel();
 		mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
 		mainPanel.setBackground(new Color(240, 248, 255));
-		mainPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
-		
-		JScrollPane scrollPane = new JScrollPane(mainPanel);
-		scrollPane.setBorder(BorderFactory.createEmptyBorder());
-		scrollPane.getViewport().setBackground(new Color(240, 248, 255));
-		add(scrollPane, BorderLayout.CENTER);
+		mainPanel.setBorder(BorderFactory.createEmptyBorder(25, 30, 25, 30));
+		mainPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
+		add(mainPanel, BorderLayout.CENTER);
 		
 		// ========== SECTION DESCRIPTION ==========
-		JPanel sectionDesc = createSectionPanel("📝 Description de la Réparation");
-		JTextArea txtDescriptionActuelle = new JTextArea(3, 30);
+		JLabel lblDescTitle = new JLabel("📝 Description de la Réparation");
+		lblDescTitle.setFont(new Font("Segoe UI", Font.BOLD, 17));
+		lblDescTitle.setForeground(new Color(44, 62, 80));
+		lblDescTitle.setAlignmentX(Component.LEFT_ALIGNMENT);
+		mainPanel.add(lblDescTitle);
+		mainPanel.add(Box.createVerticalStrut(10));
+		
+		JTextArea txtDescriptionActuelle = new JTextArea(6, 50);
 		txtDescriptionActuelle.setText(reparation.getDescription());
 		txtDescriptionActuelle.setEditable(false);
 		txtDescriptionActuelle.setLineWrap(true);
 		txtDescriptionActuelle.setWrapStyleWord(true);
-		txtDescriptionActuelle.setFont(new Font("Segoe UI", Font.PLAIN, 13));
-		txtDescriptionActuelle.setBackground(new Color(250, 250, 250));
+		txtDescriptionActuelle.setFont(new Font("Segoe UI", Font.PLAIN, 15));
+		txtDescriptionActuelle.setBackground(new Color(240, 248, 255));
 		txtDescriptionActuelle.setForeground(new Color(44, 62, 80));
-		txtDescriptionActuelle.setBorder(BorderFactory.createCompoundBorder(
-			BorderFactory.createLineBorder(new Color(230, 230, 230), 1),
-			BorderFactory.createEmptyBorder(10, 10, 10, 10)
-		));
-		JScrollPane scrollDesc = new JScrollPane(txtDescriptionActuelle);
-		scrollDesc.setBorder(BorderFactory.createEmptyBorder());
-		scrollDesc.setPreferredSize(new Dimension(600, 80));
-		sectionDesc.add(scrollDesc);
-		mainPanel.add(sectionDesc);
-		mainPanel.add(Box.createVerticalStrut(15));
+		txtDescriptionActuelle.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
+		txtDescriptionActuelle.setPreferredSize(new Dimension(640, 150));
+		txtDescriptionActuelle.setMaximumSize(new Dimension(640, 150));
+		txtDescriptionActuelle.setAlignmentX(Component.LEFT_ALIGNMENT);
+		mainPanel.add(txtDescriptionActuelle);
+		mainPanel.add(Box.createVerticalStrut(30));
 		
 		// ========== SECTION INFORMATIONS DE PAIEMENT ==========
-		JPanel sectionPaiement = createSectionPanel("💰 Informations de Paiement");
+		JLabel lblPaiementTitle = new JLabel("💰 Informations de Paiement");
+		lblPaiementTitle.setFont(new Font("Segoe UI", Font.BOLD, 17));
+		lblPaiementTitle.setForeground(new Color(44, 62, 80));
+		lblPaiementTitle.setAlignmentX(Component.LEFT_ALIGNMENT);
+		mainPanel.add(lblPaiementTitle);
+		mainPanel.add(Box.createVerticalStrut(15));
 		
 		// Coût total
-		JPanel panelCout = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
-		panelCout.setOpaque(false);
-		panelCout.setAlignmentX(Component.LEFT_ALIGNMENT);
-		
+		JLabel lblCout = new JLabel("Coût total (DH):");
 		boolean coutDefini = reparation.getCoutTotal() != null && reparation.getCoutTotal() > 0;
-		JLabel lblCout = coutDefini ? 
-			new JLabel("Cout total (DH):") : 
-			createRequiredLabel("Cout total (DH): *");
-		lblCout.setPreferredSize(new Dimension(180, 30));
-		panelCout.add(lblCout);
+		if (!coutDefini) {
+			lblCout.setText("Coût total (DH): *");
+			lblCout.setFont(new Font("Segoe UI", Font.BOLD, 15));
+			lblCout.setForeground(new Color(231, 76, 60));
+		} else {
+			lblCout.setFont(new Font("Segoe UI", Font.PLAIN, 15));
+			lblCout.setForeground(new Color(44, 62, 80));
+		}
+		lblCout.setPreferredSize(new Dimension(220, 50));
+		lblCout.setAlignmentX(Component.LEFT_ALIGNMENT);
+		mainPanel.add(lblCout);
+		mainPanel.add(Box.createVerticalStrut(5));
 		
-		txtCout = new JTextField(20);
-		txtCout.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+		txtCout = new JTextField();
+		txtCout.setFont(new Font("Segoe UI", Font.PLAIN, 16));
+		txtCout.setPreferredSize(new Dimension(400, 50));
+		txtCout.setMaximumSize(new Dimension(400, 50));
 		if (coutDefini) {
 			txtCout.setText(String.format("%.2f", reparation.getCoutTotal()));
 			txtCout.setEditable(false);
-			txtCout.setBackground(new Color(240, 240, 240));
-			txtCout.setForeground(new Color(127, 140, 141));
+			txtCout.setBackground(new Color(240, 248, 255));
+			txtCout.setForeground(new Color(44, 62, 80));
 		} else {
 			txtCout.setText("");
 			txtCout.setEditable(true);
 			txtCout.setBackground(Color.WHITE);
+			txtCout.setForeground(new Color(44, 62, 80));
 		}
-		txtCout.setBorder(BorderFactory.createCompoundBorder(
-			BorderFactory.createLineBorder(new Color(200, 200, 200), 1),
-			BorderFactory.createEmptyBorder(8, 12, 8, 12)
-		));
-		panelCout.add(txtCout);
-		sectionPaiement.add(panelCout);
-		sectionPaiement.add(Box.createVerticalStrut(10));
+		txtCout.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
+		txtCout.setAlignmentX(Component.LEFT_ALIGNMENT);
+		mainPanel.add(txtCout);
+		mainPanel.add(Box.createVerticalStrut(20));
 		
 		// Avance payée
-		JPanel panelAvance = createFieldPanel("Avance payee (DH):", false);
-		txtAvance = new JTextField(20);
-		txtAvance.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+		JLabel lblAvance = new JLabel("Avance payée (DH):");
+		lblAvance.setFont(new Font("Segoe UI", Font.PLAIN, 15));
+		lblAvance.setForeground(new Color(44, 62, 80));
+		lblAvance.setPreferredSize(new Dimension(220, 50));
+		lblAvance.setAlignmentX(Component.LEFT_ALIGNMENT);
+		mainPanel.add(lblAvance);
+		mainPanel.add(Box.createVerticalStrut(5));
+		
+		txtAvance = new JTextField();
+		txtAvance.setFont(new Font("Segoe UI", Font.PLAIN, 16));
+		txtAvance.setPreferredSize(new Dimension(400, 50));
+		txtAvance.setMaximumSize(new Dimension(400, 50));
 		if (reparation.getAvance() != null && reparation.getAvance() > 0) {
 			txtAvance.setText(String.format("%.2f", reparation.getAvance()));
 		} else {
 			txtAvance.setText("0.00");
 		}
 		txtAvance.setEditable(false);
-		txtAvance.setBackground(new Color(240, 240, 240));
-		txtAvance.setForeground(new Color(127, 140, 141));
-		txtAvance.setBorder(BorderFactory.createCompoundBorder(
-			BorderFactory.createLineBorder(new Color(200, 200, 200), 1),
-			BorderFactory.createEmptyBorder(8, 12, 8, 12)
-		));
-		panelAvance.add(txtAvance);
-		sectionPaiement.add(panelAvance);
-		sectionPaiement.add(Box.createVerticalStrut(10));
+		txtAvance.setBackground(new Color(240, 248, 255));
+		txtAvance.setForeground(new Color(44, 62, 80));
+		txtAvance.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
+		txtAvance.setAlignmentX(Component.LEFT_ALIGNMENT);
+		mainPanel.add(txtAvance);
+		mainPanel.add(Box.createVerticalStrut(20));
 		
 		// Reste à payer
-		JPanel panelReste = createFieldPanel("Reste a payer (DH):", false);
-		txtReste = new JTextField(20);
-		txtReste.setFont(new Font("Segoe UI", Font.BOLD, 14));
+		JLabel lblReste = new JLabel("Reste à payer (DH):");
+		lblReste.setFont(new Font("Segoe UI", Font.BOLD, 15));
+		lblReste.setForeground(new Color(44, 62, 80));
+		lblReste.setPreferredSize(new Dimension(220, 50));
+		lblReste.setAlignmentX(Component.LEFT_ALIGNMENT);
+		mainPanel.add(lblReste);
+		mainPanel.add(Box.createVerticalStrut(5));
+		
+		txtReste = new JTextField();
+		txtReste.setFont(new Font("Segoe UI", Font.BOLD, 18));
+		txtReste.setPreferredSize(new Dimension(400, 55));
+		txtReste.setMaximumSize(new Dimension(400, 55));
 		if (reparation.getReste() != null) {
 			txtReste.setText(String.format("%.2f", reparation.getReste()));
 		} else {
@@ -160,46 +183,20 @@ public class FormTerminerDialog extends JDialog {
 		txtReste.setEditable(false);
 		txtReste.setBackground(new Color(52, 152, 219));
 		txtReste.setForeground(Color.WHITE);
-		txtReste.setBorder(BorderFactory.createCompoundBorder(
-			BorderFactory.createLineBorder(new Color(41, 128, 185), 2),
-			BorderFactory.createEmptyBorder(8, 12, 8, 12)
-		));
-		panelReste.add(txtReste);
-		sectionPaiement.add(panelReste);
-		
-		mainPanel.add(sectionPaiement);
-		mainPanel.add(Box.createVerticalStrut(15));
-		
-		// ========== SECTION PIÈCES UTILISÉES ==========
-		JPanel sectionPieces = createSectionPanel("🔧 Pièces Utilisées");
-		txtPieces = new JTextArea(5, 30);
-		if (reparation.getPiecesUtilisees() != null && !reparation.getPiecesUtilisees().trim().isEmpty()) {
-			txtPieces.setText(reparation.getPiecesUtilisees());
-		}
-		txtPieces.setLineWrap(true);
-		txtPieces.setWrapStyleWord(true);
-		txtPieces.setFont(new Font("Segoe UI", Font.PLAIN, 13));
-		txtPieces.setBackground(Color.WHITE);
-		txtPieces.setForeground(new Color(44, 62, 80));
-		txtPieces.setBorder(BorderFactory.createCompoundBorder(
-			BorderFactory.createLineBorder(new Color(200, 200, 200), 1),
-			BorderFactory.createEmptyBorder(10, 10, 10, 10)
-		));
-		JScrollPane scrollPieces = new JScrollPane(txtPieces);
-		scrollPieces.setBorder(BorderFactory.createEmptyBorder());
-		scrollPieces.setPreferredSize(new Dimension(600, 120));
-		sectionPieces.add(scrollPieces);
-		mainPanel.add(sectionPieces);
+		txtReste.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
+		txtReste.setAlignmentX(Component.LEFT_ALIGNMENT);
+		mainPanel.add(txtReste);
+		mainPanel.add(Box.createVerticalStrut(30));
 		
 		// ========== BOUTONS ==========
-		JPanel panelBoutons = new JPanel(new FlowLayout(FlowLayout.CENTER, 15, 20));
+		JPanel panelBoutons = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 20));
 		panelBoutons.setOpaque(false);
-		panelBoutons.setBorder(BorderFactory.createEmptyBorder(20, 0, 0, 0));
+		panelBoutons.setBorder(BorderFactory.createEmptyBorder(10, 0, 10, 0));
 		
 		JButton btnTerminer = createModernButton("✅ Terminer", new Color(46, 204, 113), new Color(39, 174, 96));
-		btnTerminer.setPreferredSize(new Dimension(180, 45));
+		btnTerminer.setPreferredSize(new Dimension(200, 50));
 		JButton btnAnnuler = createModernButton("❌ Annuler", new Color(127, 140, 141), new Color(108, 117, 125));
-		btnAnnuler.setPreferredSize(new Dimension(180, 45));
+		btnAnnuler.setPreferredSize(new Dimension(200, 50));
 		
 		panelBoutons.add(btnTerminer);
 		panelBoutons.add(btnAnnuler);
@@ -255,9 +252,9 @@ public class FormTerminerDialog extends JDialog {
 		};
 		panel.setOpaque(false);
 		panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-		panel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
-		panel.setPreferredSize(new Dimension(600, 0));
-		panel.setMaximumSize(new Dimension(600, Short.MAX_VALUE));
+		panel.setBorder(BorderFactory.createEmptyBorder(25, 25, 25, 25));
+		panel.setPreferredSize(new Dimension(640, 0));
+		panel.setMaximumSize(new Dimension(640, Short.MAX_VALUE));
 		
 		JLabel lblTitle = new JLabel(title);
 		lblTitle.setFont(new Font("Segoe UI", Font.BOLD, 16));
@@ -275,9 +272,9 @@ public class FormTerminerDialog extends JDialog {
 		panel.setAlignmentX(Component.LEFT_ALIGNMENT);
 		
 		JLabel label = new JLabel(labelText);
-		label.setFont(new Font("Segoe UI", Font.PLAIN, 13));
+		label.setFont(new Font("Segoe UI", Font.PLAIN, 15));
 		label.setForeground(new Color(44, 62, 80));
-		label.setPreferredSize(new Dimension(180, 30));
+		label.setPreferredSize(new Dimension(220, 50));
 		panel.add(label);
 		
 		return panel;
@@ -285,9 +282,9 @@ public class FormTerminerDialog extends JDialog {
 	
 	private JLabel createRequiredLabel(String text) {
 		JLabel label = new JLabel(text);
-		label.setFont(new Font("Segoe UI", Font.BOLD, 13));
+		label.setFont(new Font("Segoe UI", Font.BOLD, 15));
 		label.setForeground(new Color(231, 76, 60));
-		label.setPreferredSize(new Dimension(180, 30));
+		label.setPreferredSize(new Dimension(220, 50));
 		return label;
 	}
 	
@@ -374,11 +371,12 @@ public class FormTerminerDialog extends JDialog {
 	
 	private void terminer() {
 		try {
-			String pieces = txtPieces.getText().trim();
+			// Utiliser les pièces existantes de la réparation ou une chaîne vide
+			String pieces = (reparation.getPiecesUtilisees() != null) ? reparation.getPiecesUtilisees() : "";
 			Double cout = parseDoubleLocalized(txtCout.getText());
 			
 			gestion.terminerReparation(reparation.getId(), reparation.getDescription(), pieces, cout);
-			JOptionPane.showMessageDialog(this, "Reparation terminee avec succes!", "Succès", JOptionPane.INFORMATION_MESSAGE);
+			JOptionPane.showMessageDialog(this, "Réparation terminée avec succès!", "Succès", JOptionPane.INFORMATION_MESSAGE);
 			dispose();
 		} catch (GestionException ex) {
 			JOptionPane.showMessageDialog(this, "Erreur: " + ex.getMessage(), "Erreur", JOptionPane.ERROR_MESSAGE);
