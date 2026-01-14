@@ -1,1 +1,19 @@
+# Maven
 /target/
+*.class
+
+# IDE files
+.classpath
+.project
+.settings/
+.idea/
+*.iml
+*.iws
+*.ipr
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Test files (if needed)
+# src/test/resources/test/mysql-connector-java-8.0.28.jar

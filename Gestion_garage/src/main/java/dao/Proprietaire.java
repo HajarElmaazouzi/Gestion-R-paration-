@@ -2,12 +2,16 @@ package dao;
 
 import javax.persistence.*;
 
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
+
+
+@SuperBuilder
+@NoArgsConstructor
+@Data
 @Entity
-public class Proprietaire extends Utilisateur {
+@Table(name = "proprietaires")
+public class Proprietaire extends UserDAO {
 
-    @OneToOne
-    private Boutique boutique;
-
-    public Boutique getBoutique() { return boutique; }
-    public void setBoutique(Boutique boutique) { this.boutique = boutique; }
 }
