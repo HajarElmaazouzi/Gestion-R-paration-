@@ -17,6 +17,7 @@ public class LoginPanel extends JPanel {
     private JPanel mainMenuPanel;
     private MainWindow mainWindow;
     private String expectedUserType; // "Propriétaire" or "Réparateur"
+    private JLabel createAccountLink; // Reference to create account link
 
     public LoginPanel(MainWindow mainWindow) {
         this.mainWindow = mainWindow;
@@ -242,8 +243,35 @@ public class LoginPanel extends JPanel {
         card.add(Box.createVerticalStrut(15));
         card.add(backBtn);
         
+        // Link to create account (only for Propriétaire section)
+        createAccountLink = new JLabel("<html><u>Créer un compte</u></html>");
+        createAccountLink.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+        createAccountLink.setForeground(new Color(52, 152, 219));
+        createAccountLink.setAlignmentX(Component.CENTER_ALIGNMENT);
+        createAccountLink.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        card.add(Box.createVerticalStrut(10));
+        card.add(createAccountLink);
+        
         // Actions
         GestionUtilisateur gu = new GestionUtilisateur();
+        
+        // Action for create account link
+        createAccountLink.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mouseClicked(java.awt.event.MouseEvent e) {
+                showCreateAccountDialog();
+            }
+            
+            @Override
+            public void mouseEntered(java.awt.event.MouseEvent e) {
+                createAccountLink.setForeground(new Color(41, 128, 185));
+            }
+            
+            @Override
+            public void mouseExited(java.awt.event.MouseEvent e) {
+                createAccountLink.setForeground(new Color(52, 152, 219));
+            }
+        });
         
         loginBtn.addActionListener(e -> {
             String username = usernameField.getText().trim();
@@ -261,20 +289,28 @@ public class LoginPanel extends JPanel {
                     userTypeName = "Réparateur";
                     if ("Réparateur".equals(expectedUserType)) {
                         isValidLogin = true;
-                        mainWindow.showReparateurPanel((ReparateurDAO) user);
+                        mainWindow.showReparateurPanel(user);
                     }
                 } else if (user instanceof Proprietaire) {
                     userTypeName = "Propriétaire";
-                    if ("Propriétaire".equals(expectedUserType)) {
+                    if ("Réparateur".equals(expectedUserType)) {
+                        // Proprietaire peut aussi se connecter comme Réparateur
                         isValidLogin = true;
-                        mainWindow.showOwnerPanel((UserDAO) user);
+                        mainWindow.showReparateurPanel(user);
+                    } else if ("Propriétaire".equals(expectedUserType)) {
+                        isValidLogin = true;
+                        mainWindow.showOwnerPanel(user);
                     }
                 } else if (user instanceof UserDAO) {
                     // UserDAO de base - traiter comme Proprietaire pour compatibilité
                     userTypeName = "Propriétaire";
-                    if ("Propriétaire".equals(expectedUserType)) {
+                    if ("Réparateur".equals(expectedUserType)) {
+                        // UserDAO peut aussi se connecter comme Réparateur
                         isValidLogin = true;
-                        mainWindow.showOwnerPanel((UserDAO) user);
+                        mainWindow.showReparateurPanel(user);
+                    } else if ("Propriétaire".equals(expectedUserType)) {
+                        isValidLogin = true;
+                        mainWindow.showOwnerPanel(user);
                     }
                 }
                 
@@ -312,9 +348,137 @@ public class LoginPanel extends JPanel {
         if (passwordField != null) {
             passwordField.setText("");
         }
+        // Afficher le lien "Créer un compte" uniquement pour la section Propriétaire
+        if (createAccountLink != null) {
+            createAccountLink.setVisible("Propriétaire".equals(userType));
+        }
     }
     
-    private void initializeDefaultUsers() {
+	private void showCreateAccountDialog() {
+		JDialog dialog = new JDialog((Frame) SwingUtilities.getWindowAncestor(this), "Créer un compte Propriétaire", true);
+		dialog.setSize(450, 400);
+		dialog.getContentPane().setBackground(new Color(240, 248, 255));
+		dialog.setLocationRelativeTo(this);
+		dialog.setLayout(new GridBagLayout());
+		GridBagConstraints gbc = new GridBagConstraints();
+		gbc.insets = new Insets(15, 15, 15, 15);
+		gbc.fill = GridBagConstraints.HORIZONTAL;
+		
+		JLabel lblDialogTitle = new JLabel("✨ Créer un Compte Propriétaire");
+		lblDialogTitle.setFont(new Font("Segoe UI", Font.BOLD, 20));
+		lblDialogTitle.setForeground(new Color(44, 62, 80));
+		gbc.gridx = 0; gbc.gridy = 0;
+		gbc.gridwidth = 2;
+		gbc.anchor = GridBagConstraints.CENTER;
+		dialog.add(lblDialogTitle, gbc);
+		
+		gbc.gridwidth = 1;
+		gbc.anchor = GridBagConstraints.WEST;
+		
+		// Username field
+		JLabel lblUsername = new JLabel("Nom d'utilisateur:");
+		lblUsername.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+		lblUsername.setForeground(new Color(127, 140, 141));
+		JTextField usernameField = new JTextField(25);
+		usernameField.setPreferredSize(new Dimension(350, 35));
+		usernameField.setBorder(BorderFactory.createCompoundBorder(
+			BorderFactory.createLineBorder(new Color(200, 200, 200), 1),
+			BorderFactory.createEmptyBorder(8, 12, 8, 12)
+		));
+		
+		gbc.gridx = 0; gbc.gridy = 1;
+		dialog.add(lblUsername, gbc);
+		gbc.gridx = 1;
+		dialog.add(usernameField, gbc);
+		
+		// Password field
+		JLabel lblPassword = new JLabel("Mot de passe:");
+		lblPassword.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+		lblPassword.setForeground(new Color(127, 140, 141));
+		JPasswordField passwordField = new JPasswordField(25);
+		passwordField.setPreferredSize(new Dimension(350, 35));
+		passwordField.setBorder(BorderFactory.createCompoundBorder(
+			BorderFactory.createLineBorder(new Color(200, 200, 200), 1),
+			BorderFactory.createEmptyBorder(8, 12, 8, 12)
+		));
+		
+		gbc.gridx = 0; gbc.gridy = 2;
+		dialog.add(lblPassword, gbc);
+		gbc.gridx = 1;
+		dialog.add(passwordField, gbc);
+		
+		// Create button
+		JButton createBtn = createModernButton("Créer le compte", new Color(46, 204, 113), new Color(39, 174, 96));
+		createBtn.setPreferredSize(new Dimension(350, 40));
+		
+		gbc.gridx = 0; gbc.gridy = 3;
+		gbc.gridwidth = 2;
+		gbc.anchor = GridBagConstraints.CENTER;
+		gbc.insets = new Insets(20, 15, 15, 15);
+		dialog.add(createBtn, gbc);
+		
+		// Cancel button
+		JButton cancelBtn = new JButton("Annuler");
+		cancelBtn.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+		cancelBtn.setBackground(Color.WHITE);
+		cancelBtn.setForeground(new Color(100, 100, 100));
+		cancelBtn.setFocusPainted(false);
+		cancelBtn.setBorderPainted(false);
+		cancelBtn.setCursor(new Cursor(Cursor.HAND_CURSOR));
+		cancelBtn.addActionListener(e -> dialog.dispose());
+		
+		gbc.gridx = 0; gbc.gridy = 4;
+		gbc.insets = new Insets(5, 15, 15, 15);
+		dialog.add(cancelBtn, gbc);
+		
+		// Action for create button
+		createBtn.addActionListener(e -> {
+			String username = usernameField.getText().trim();
+			String password = new String(passwordField.getPassword()).trim();
+			
+			// Validation
+			if (username.isEmpty() || password.isEmpty()) {
+				JOptionPane.showMessageDialog(dialog, "Veuillez remplir tous les champs obligatoires.", "Erreur", JOptionPane.ERROR_MESSAGE);
+				return;
+			}
+			
+			GestionUtilisateur gu = new GestionUtilisateur();
+			if (gu.userExists(username)) {
+				JOptionPane.showMessageDialog(dialog, "Ce nom d'utilisateur existe déjà. Veuillez en choisir un autre.", "Erreur", JOptionPane.ERROR_MESSAGE);
+				return;
+			}
+			
+			try {
+				GestionCaisses gestionCaisses = new GestionCaisses();
+				CaisseDAO caisse = gestionCaisses.creerCaisse();
+				if (caisse == null) {
+					JOptionPane.showMessageDialog(dialog, "Erreur: Impossible de créer la caisse.", "Erreur", JOptionPane.ERROR_MESSAGE);
+					return;
+				}
+				
+				// Create Proprietaire
+				Proprietaire nouveau = Proprietaire.builder()
+						.username(username)
+						.password(password)
+						.caisse(caisse)
+						.build();
+				
+				gu.CreerUser(nouveau);
+				dialog.dispose();
+				
+				// Show success message
+				JOptionPane.showMessageDialog(this, "Compte Propriétaire créé avec succès!\nVous pouvez maintenant vous connecter.", "Compte créé", JOptionPane.INFORMATION_MESSAGE);
+				
+			} catch (Exception ex) {
+				JOptionPane.showMessageDialog(dialog, "Erreur lors de la création du compte: " + ex.getMessage(), "Erreur", JOptionPane.ERROR_MESSAGE);
+				ex.printStackTrace();
+			}
+		});
+		
+		dialog.setVisible(true);
+	}
+	
+	private void initializeDefaultUsers() {
         GestionUtilisateur gu = new GestionUtilisateur();
         GestionCaisses gc = new GestionCaisses();
         

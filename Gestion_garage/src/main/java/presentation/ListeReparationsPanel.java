@@ -21,6 +21,7 @@ public class ListeReparationsPanel extends JPanel {
 	private MainWindow mainWindow;
 	private boolean voirToutes;
 	private JCheckBox chkVoirToutes;
+	private boolean modeReparateur;  // Indique si on est en mode réparateur (même pour Proprietaire)
 
 	public ListeReparationsPanel(UserDAO user, MainWindow mainWindow, boolean voirToutes) {
 		this.user = user;
@@ -48,19 +49,20 @@ public class ListeReparationsPanel extends JPanel {
 		headerPanel.setBounds(0, 0, 900, 80);
 		add(headerPanel);
 		
-		// Déterminer le type d'utilisateur une seule fois
-		boolean isReparateur = user instanceof dao.ReparateurDAO;
+		// Si voirToutes = false, on vient du ReparateurPanel (même pour Proprietaire), donc mode réparateur
+		// En mode réparateur, les boutons de création/modification sont visibles
+		this.modeReparateur = !voirToutes;
 		
-		// Titre différent selon le type d'utilisateur
-		String title = isReparateur ? "🔧 Mes Réparations" : "👁️ Suivi des Réparations";
+		// Titre différent selon le contexte
+		String title = modeReparateur ? "🔧 Mes Réparations" : "👁️ Suivi des Réparations";
 		JLabel lblTitle = new JLabel(title);
 		lblTitle.setFont(new Font("Segoe UI", Font.BOLD, 28));
 		lblTitle.setForeground(Color.WHITE);
 		lblTitle.setBounds(20, 15, 400, 35);
 		headerPanel.add(lblTitle);
 		
-		// Checkbox "Voir toutes" (seulement pour propriétaire)
-		if (!isReparateur) {
+		// Checkbox "Voir toutes" (seulement pour propriétaire en mode consultation)
+		if (voirToutes) {
 			chkVoirToutes = new JCheckBox("👁️ Voir toutes les réparations");
 			chkVoirToutes.setSelected(voirToutes);
 			chkVoirToutes.setFont(new Font("Segoe UI", Font.PLAIN, 12));
@@ -100,28 +102,28 @@ public class ListeReparationsPanel extends JPanel {
 		add(sidebarPanel);
 		
 		// Boutons d'action
-		// Seul le réparateur peut créer/modifier/supprimer des réparations
+		// Les boutons sont visibles en mode réparateur (voirToutes = false)
 		JButton btnCreer = createSidebarButton("➕ Créer Réparation", new Color(46, 204, 113));
 		btnCreer.setBounds(10, 20, 160, 50);
-		btnCreer.setVisible(isReparateur); // Seulement visible pour les réparateurs
+		btnCreer.setVisible(modeReparateur); // Visible en mode réparateur (même pour Proprietaire)
 		sidebarPanel.add(btnCreer);
 		
 		JButton btnModifier = createSidebarButton("✏️ Modifier", new Color(52, 152, 219));
 		btnModifier.setBounds(10, 80, 160, 50);
-		btnModifier.setVisible(isReparateur); // Seulement visible pour les réparateurs
+		btnModifier.setVisible(modeReparateur); // Visible en mode réparateur (même pour Proprietaire)
 		sidebarPanel.add(btnModifier);
 		
 		JButton btnSupprimer = createSidebarButton("🗑️ Supprimer", new Color(231, 76, 60));
 		btnSupprimer.setBounds(10, 140, 160, 50);
-		btnSupprimer.setVisible(isReparateur); // Seulement visible pour les réparateurs
+		btnSupprimer.setVisible(modeReparateur); // Visible en mode réparateur (même pour Proprietaire)
 		sidebarPanel.add(btnSupprimer);
 		
 		JButton btnRefresh = createSidebarButton("🔄 Actualiser", new Color(127, 140, 141));
-		// Le bouton Actualiser est positionné différemment selon le type d'utilisateur
-		if (isReparateur) {
+		// Le bouton Actualiser est positionné différemment selon le mode
+		if (modeReparateur) {
 			btnRefresh.setBounds(10, 200, 160, 50);
 		} else {
-			// Pour le propriétaire, le bouton Actualiser est en haut
+			// Pour le propriétaire en mode consultation, le bouton Actualiser est en haut
 			btnRefresh.setBounds(10, 20, 160, 50);
 		}
 		sidebarPanel.add(btnRefresh);
@@ -191,7 +193,7 @@ public class ListeReparationsPanel extends JPanel {
 				if (value != null) {
 					String str = value.toString();
 					if (str.contains("DH")) {
-						String numStr = str.replace(" DH", "").trim();
+						String numStr = str.replace(" DH", "").trim().replace(',', '.');
 						try {
 							double cout = Double.parseDouble(numStr);
 							if (cout > 0) {
@@ -312,7 +314,7 @@ public class ListeReparationsPanel extends JPanel {
 		btnModifier.addActionListener(e -> {
 			int row = table.getSelectedRow();
 			if (row != -1) {
-				Reparation rep = (Reparation) model.getValueAt(row, 5);
+				Reparation rep = (Reparation) model.getValueAt(row, 6);
 				if (rep.getEtat() == EtatReparation.OUVERT) {
 					FormReparationDialog dialog = new FormReparationDialog(mainWindow, user, rep);
 					dialog.setVisible(true);
@@ -328,7 +330,7 @@ public class ListeReparationsPanel extends JPanel {
 		btnSupprimer.addActionListener(e -> {
 			int row = table.getSelectedRow();
 			if (row != -1) {
-				Reparation rep = (Reparation) model.getValueAt(row, 5);
+				Reparation rep = (Reparation) model.getValueAt(row, 6);
 				if (rep.getEtat() == EtatReparation.OUVERT) {
 					int confirm = JOptionPane.showConfirmDialog(this, 
 						"Voulez-vous vraiment supprimer cette reparation?", 
@@ -354,10 +356,15 @@ public class ListeReparationsPanel extends JPanel {
 		btnRefresh.addActionListener(e -> refreshTable());
 		
 		btnRetourHeader.addActionListener(e -> {
-			if (user instanceof dao.ReparateurDAO) {
-				mainWindow.showReparateurPanel((dao.ReparateurDAO) user);
-			} else {
+			// Utiliser voirToutes pour déterminer d'où on vient:
+			// - voirToutes = false → vient de ReparateurPanel → retourner au ReparateurPanel
+			// - voirToutes = true → vient de OwnerPanel → retourner au OwnerPanel
+			if (voirToutes) {
+				// Vient de OwnerPanel
 				mainWindow.showOwnerPanel(user);
+			} else {
+				// Vient de ReparateurPanel (même si c'est un Proprietaire connecté depuis cette section)
+				mainWindow.showReparateurPanel(user);
 			}
 		});
 	}
@@ -579,12 +586,11 @@ public class ListeReparationsPanel extends JPanel {
 				BorderFactory.createEmptyBorder(5, 5, 5, 5)
 			));
 			
-			// Seul le réparateur peut effectuer des actions sur les réparations
-			// Utiliser la variable de la portée externe (déclarée dans le constructeur)
-			boolean isReparateurUser = user instanceof dao.ReparateurDAO;
+			// Les actions sont disponibles en mode réparateur (même pour Proprietaire connecté depuis section Réparateur)
+			// Utiliser modeReparateur de la portée externe
 			
-			// Actions selon l'état (seulement pour les réparateurs)
-			if (isReparateurUser && currentReparation != null) {
+			// Actions selon l'état (seulement en mode réparateur)
+			if (modeReparateur && currentReparation != null) {
 				switch (currentReparation.getEtat()) {
 					case OUVERT:
 						JMenuItem itemDemarrer = createMenuItem("▶ Démarrer la Réparation", new Color(46, 204, 113));
@@ -705,7 +711,8 @@ public class ListeReparationsPanel extends JPanel {
 		
 		private void gererAppareils() {
 			fireEditingStopped();
-			mainWindow.showAppareilsReparation(user, currentReparation);
+			// Passer le paramètre voirToutes pour préserver le contexte
+			mainWindow.showAppareilsReparation(user, currentReparation, voirToutes);
 		}
 	}
 }

@@ -17,8 +17,10 @@ public class OwnerPanel extends JPanel {
 	private static final long serialVersionUID = 1L;
 	private JTable table;
 	private DefaultTableModel model;
+	private UserDAO owner;  // Stocker le propriétaire connecté
 
 	public OwnerPanel(UserDAO owner, MainWindow mainWindow) {
+		this.owner = owner;  // Stocker le propriétaire
 		setLayout(null);
 		setBackground(new Color(240, 248, 255));
 		
@@ -175,7 +177,7 @@ public class OwnerPanel extends JPanel {
 		});
 		
 		btnStockAppareils.addActionListener(e -> {
-			mainWindow.showGestionAppareils(owner);
+			mainWindow.showGestionAppareils(owner, false);  // false = vient de OwnerPanel
 		});
 		
 		btnRefresh.addActionListener(e -> {
@@ -197,7 +199,14 @@ public class OwnerPanel extends JPanel {
 		model.setRowCount(0);
 		GestionUtilisateur gu = new GestionUtilisateur();
 		GestionReparation gestionReparation = new GestionReparation();
-		List<ReparateurDAO> reparateurs = gu.ListerReparateurs();
+		// Filtrer les réparateurs par le propriétaire connecté
+		List<ReparateurDAO> reparateurs;
+		if (owner instanceof dao.Proprietaire) {
+			metier.GestionBoutique gestionBoutique = new metier.GestionBoutique();
+			reparateurs = gestionBoutique.listerReparateursParProprietaire((dao.Proprietaire) owner);
+		} else {
+			reparateurs = gu.ListerReparateurs();
+		}
 		
 		if (reparateurs != null && !reparateurs.isEmpty()) {
 			for (ReparateurDAO r : reparateurs) {

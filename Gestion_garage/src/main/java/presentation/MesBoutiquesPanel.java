@@ -17,12 +17,14 @@ public class MesBoutiquesPanel extends JPanel {
 	private DefaultTableModel model;
 	private GestionBoutique gestion;
 	private  List<BoutiqueDAO> boutiques;
+	private UserDAO user;  // Stocker l'utilisateur connecté
 
 
 	/**
 	 * Create the panel.
 	 */
 	public MesBoutiquesPanel(UserDAO user, MainWindow mainWindow) {
+		this.user = user;  // Stocker l'utilisateur
 	    setLayout(null);
 	    setBackground(new Color(240, 248, 255));
 	    
@@ -217,6 +219,10 @@ public class MesBoutiquesPanel extends JPanel {
 	                BoutiqueDAO nouvelleBoutique = new BoutiqueDAO();
 	                nouvelleBoutique.setNom(nom);
 	                nouvelleBoutique.setAdresse(adresse);
+	                // Associer la boutique au propriétaire connecté
+	                if (user instanceof dao.Proprietaire) {
+	                    nouvelleBoutique.setProprietaire((dao.Proprietaire) user);
+	                }
 
 	                gestion.ajouterBoutique(nouvelleBoutique);
 	                refreshTable();
@@ -267,7 +273,8 @@ public class MesBoutiquesPanel extends JPanel {
 	                int boutiqueId = Integer.parseInt(String.valueOf(idValue));
 
 	                GestionBoutique gb = new GestionBoutique();
-	                java.util.List<dao.ReparateurDAO> reparateurs = gb.ListReparateurBoutique(boutiqueId);
+	                @SuppressWarnings("unchecked")
+	                java.util.List<dao.ReparateurDAO> reparateurs = (java.util.List<dao.ReparateurDAO>) gb.ListReparateurBoutique(boutiqueId);
 
 	                StringBuilder sb = new StringBuilder("Réparateurs de la boutique " + boutiqueId + ":\n\n");
 	                if (reparateurs != null && !reparateurs.isEmpty()) {
@@ -297,7 +304,12 @@ public class MesBoutiquesPanel extends JPanel {
 	
 	private void refreshTable() {
 	    model.setRowCount(0);
-	    boutiques = gestion.afficherBoutique();
+	    // Filtrer les boutiques par le propriétaire connecté
+	    if (user instanceof dao.Proprietaire) {
+	    	boutiques = gestion.afficherBoutiquesParProprietaire((dao.Proprietaire) user);
+	    } else {
+	    	boutiques = gestion.afficherBoutique();
+	    }
 	    if (boutiques != null) {
 	        for (BoutiqueDAO b : boutiques) {
 	            model.addRow(new Object[]{b.getId(), b.getNom(), b.getAdresse()});

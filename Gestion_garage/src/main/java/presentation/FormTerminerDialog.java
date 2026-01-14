@@ -223,7 +223,7 @@ public class FormTerminerDialog extends JDialog {
 				try {
 					String coutText = txtCout.getText().trim();
 					if (!coutText.isEmpty()) {
-						double cout = Double.parseDouble(coutText);
+						double cout = parseDoubleLocalized(coutText);
 						double avance = reparation.getAvance() != null ? reparation.getAvance() : 0.0;
 						double reste = Math.max(0.0, cout - avance);
 						txtReste.setText(String.format("%.2f", reste));
@@ -332,7 +332,7 @@ public class FormTerminerDialog extends JDialog {
 		}
 		
 		try {
-			Double cout = Double.parseDouble(coutText);
+			Double cout = parseDoubleLocalized(coutText);
 			if (cout < 0) {
 				JOptionPane.showMessageDialog(this, "Le cout total ne peut pas etre negatif", "Erreur", JOptionPane.ERROR_MESSAGE);
 				txtCout.requestFocus();
@@ -360,10 +360,22 @@ public class FormTerminerDialog extends JDialog {
 		return true;
 	}
 	
+	/**
+	 * Parse un nombre en gérant les formats avec virgule (français) et point (anglais)
+	 */
+	private Double parseDoubleLocalized(String text) {
+		if (text == null || text.trim().isEmpty()) {
+			return 0.0;
+		}
+		// Remplacer la virgule par un point pour le parsing
+		String normalized = text.trim().replace(',', '.');
+		return Double.parseDouble(normalized);
+	}
+	
 	private void terminer() {
 		try {
 			String pieces = txtPieces.getText().trim();
-			Double cout = Double.parseDouble(txtCout.getText().trim());
+			Double cout = parseDoubleLocalized(txtCout.getText());
 			
 			gestion.terminerReparation(reparation.getId(), reparation.getDescription(), pieces, cout);
 			JOptionPane.showMessageDialog(this, "Reparation terminee avec succes!", "Succès", JOptionPane.INFORMATION_MESSAGE);

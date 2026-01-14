@@ -2,8 +2,10 @@ package metier;
 import java.util.List;
 
 import javax.persistence.EntityManager;
+import javax.persistence.TypedQuery;
 
 import dao.BoutiqueDAO;
+import dao.Proprietaire;
 import dao.ReparateurDAO;
 
 public class GestionBoutique implements IGestionBoutique {
@@ -61,6 +63,56 @@ public class GestionBoutique implements IGestionBoutique {
 		}
 		return boutiques;
 		
+	}
+	
+	/**
+	 * Liste les boutiques d'un propriétaire spécifique
+	 */
+	public List<BoutiqueDAO> afficherBoutiquesParProprietaire(Proprietaire proprietaire) {
+		List<BoutiqueDAO> boutiques = null;
+		try {
+			em.getTransaction().begin();
+
+			TypedQuery<BoutiqueDAO> query = em.createQuery(
+				"SELECT b FROM BoutiqueDAO b WHERE b.proprietaire.id = :proprietaireId", 
+				BoutiqueDAO.class);
+			query.setParameter("proprietaireId", proprietaire.getId());
+			boutiques = query.getResultList();
+
+			em.getTransaction().commit();
+			System.out.println("✅ Boutiques du propriétaire récupérées avec succès");
+		} catch (Exception e) {
+			if (em.getTransaction().isActive()) {
+				em.getTransaction().rollback();
+			}
+			System.err.println("❌ Erreur lors de la récupération des boutiques du propriétaire : " + e.getMessage());
+		}
+		return boutiques;
+	}
+	
+	/**
+	 * Liste les réparateurs d'un propriétaire (via ses boutiques)
+	 */
+	public List<ReparateurDAO> listerReparateursParProprietaire(Proprietaire proprietaire) {
+		List<ReparateurDAO> reparateurs = null;
+		try {
+			em.getTransaction().begin();
+
+			TypedQuery<ReparateurDAO> query = em.createQuery(
+				"SELECT r FROM ReparateurDAO r WHERE r.boutique.proprietaire.id = :proprietaireId", 
+				ReparateurDAO.class);
+			query.setParameter("proprietaireId", proprietaire.getId());
+			reparateurs = query.getResultList();
+
+			em.getTransaction().commit();
+			System.out.println("✅ Réparateurs du propriétaire récupérés avec succès");
+		} catch (Exception e) {
+			if (em.getTransaction().isActive()) {
+				em.getTransaction().rollback();
+			}
+			System.err.println("❌ Erreur lors de la récupération des réparateurs du propriétaire : " + e.getMessage());
+		}
+		return reparateurs;
 	}
 
 	@Override

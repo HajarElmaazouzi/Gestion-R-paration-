@@ -2,13 +2,13 @@ package presentation;
 
 import javax.swing.*;
 import java.awt.*;
-import dao.ReparateurDAO;
+import dao.UserDAO;
 
 public class ReparateurPanel extends JPanel {
 
 	private static final long serialVersionUID = 1L;
 
-	public ReparateurPanel(ReparateurDAO reparateur, MainWindow mainWindow) {
+	public ReparateurPanel(UserDAO user, MainWindow mainWindow) {
 		setLayout(null);
 		setBackground(new Color(240, 248, 255));
 		
@@ -35,7 +35,7 @@ public class ReparateurPanel extends JPanel {
 		lblTitle.setBounds(20, 15, 400, 35);
 		headerPanel.add(lblTitle);
 		
-		JLabel lblWelcome = new JLabel("Bienvenue, " + reparateur.getUsername() + " 👋");
+		JLabel lblWelcome = new JLabel("Bienvenue, " + user.getUsername() + " 👋");
 		lblWelcome.setFont(new Font("Segoe UI", Font.PLAIN, 14));
 		lblWelcome.setForeground(new Color(255, 255, 255, 200));
 		lblWelcome.setBounds(20, 50, 300, 20);
@@ -119,11 +119,11 @@ public class ReparateurPanel extends JPanel {
 		// ========== ACTIONS ==========
 		
 		btnMesReparations.addActionListener(e -> {
-			mainWindow.showListeReparations(reparateur, false);
+			mainWindow.showListeReparations(user, false);
 		});
 		
 		btnGererAppareils.addActionListener(e -> {
-			mainWindow.showGestionAppareils(reparateur);
+			mainWindow.showGestionAppareils(user, true);  // true = vient de ReparateurPanel
 		});
 		
 		btnLogout.addActionListener(e -> {

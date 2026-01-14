@@ -19,11 +19,13 @@ public class AppareilsReparationPanel extends JPanel {
 	private UserDAO user;
 	private MainWindow mainWindow;
 	private JLabel lblInfos; // Label pour afficher les infos de la réparation
+	private boolean voirToutes;  // Indique si on vient de OwnerPanel (true) ou ReparateurPanel (false)
 
-	public AppareilsReparationPanel(UserDAO user, MainWindow mainWindow, Reparation reparation) {
+	public AppareilsReparationPanel(UserDAO user, MainWindow mainWindow, Reparation reparation, boolean voirToutes) {
 		this.user = user;
 		this.mainWindow = mainWindow;
 		this.reparation = reparation;
+		this.voirToutes = voirToutes;
 		this.gestion = new GestionReparation();
 		
 		setLayout(null);
@@ -183,7 +185,7 @@ public class AppareilsReparationPanel extends JPanel {
 		});
 		
 		btnRetourHeader.addActionListener(e -> {
-			boolean voirToutes = !(user instanceof dao.ReparateurDAO);
+			// Utiliser le paramètre voirToutes stocké pour retourner au bon panel
 			mainWindow.showListeReparations(user, voirToutes);
 		});
 		

@@ -12,7 +12,7 @@
   <properties>
 
    <property name="hibernate.connection.url"
-     value="jdbc:mysql://localhost:3306/stockApp?createDatabaseIfNotExist=true"/>
+     value="jdbc:mysql://localhost:3307/stockApp?createDatabaseIfNotExist=true"/>
 
    <property name="hibernate.connection.user" value="root"/>
    <property name="hibernate.connection.password" value=""/>

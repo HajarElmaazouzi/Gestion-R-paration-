@@ -164,16 +164,14 @@ public class GestionReparation implements IGestionReparation {
     
     @Override
     public Reparation creerReparation(Reparation reparation, UserDAO userConnecte) throws GestionException {
-        // Validation: Seuls les réparateurs peuvent créer des réparations
-        if (!(userConnecte instanceof ReparateurDAO)) {
-            throw new GestionException("Seuls les réparateurs peuvent créer des réparations");
-        }
+        // Permettre aux réparateurs ET aux propriétaires de créer des réparations
+        // Les propriétaires peuvent aussi agir comme réparateurs
         
         EntityTransaction tx = em.getTransaction();
         try {
             tx.begin();
             
-            // L'utilisateur connecté est automatiquement le réparateur
+            // L'utilisateur connecté est automatiquement le réparateur (peut être ReparateurDAO ou Proprietaire)
             reparation.setReparateur(userConnecte);
             
             em.persist(reparation);

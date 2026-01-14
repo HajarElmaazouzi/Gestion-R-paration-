@@ -5,7 +5,6 @@ import java.awt.EventQueue;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
-import dao.ReparateurDAO;
 import dao.Reparation;
 import dao.UserDAO;
 import java.awt.CardLayout;
@@ -62,8 +61,8 @@ public class MainWindow extends JFrame {
 		cardLayout.show(contentPane, "ownerPanel");
 	}
 	
-	public void showReparateurPanel(ReparateurDAO reparateur) {
-		ReparateurPanel reparateurPanel = new ReparateurPanel(reparateur, this);
+	public void showReparateurPanel(UserDAO user) {
+		ReparateurPanel reparateurPanel = new ReparateurPanel(user, this);
 		contentPane.add(reparateurPanel, "reparateurPanel");
 		cardLayout.show(contentPane, "reparateurPanel");
 	}
@@ -105,19 +104,39 @@ public class MainWindow extends JFrame {
 	
 	/**
 	 * Affiche les appareils associés à une réparation
+	 * @param voirToutes true si vient de OwnerPanel, false si vient de ReparateurPanel
 	 */
-	public void showAppareilsReparation(UserDAO user, Reparation reparation) {
-	    AppareilsReparationPanel panel = new AppareilsReparationPanel(user, this, reparation);
+	public void showAppareilsReparation(UserDAO user, Reparation reparation, boolean voirToutes) {
+	    AppareilsReparationPanel panel = new AppareilsReparationPanel(user, this, reparation, voirToutes);
 	    contentPane.add(panel, "appareilsReparation");
 	    cardLayout.show(contentPane, "appareilsReparation");
 	}
 	
 	/**
-	 * Affiche la gestion du stock d'appareils
+	 * Affiche les appareils associés à une réparation (surcharge pour compatibilité)
 	 */
-	public void showGestionAppareils(UserDAO user) {
-	    GestionAppareilsPanel panel = new GestionAppareilsPanel(user, this);
+	public void showAppareilsReparation(UserDAO user, Reparation reparation) {
+		// Par défaut, déterminer depuis quel panel selon le type d'utilisateur
+		boolean voirToutes = !(user instanceof dao.ReparateurDAO);
+		showAppareilsReparation(user, reparation, voirToutes);
+	}
+	
+	/**
+	 * Affiche la gestion du stock d'appareils
+	 * @param fromReparateurPanel true si appelé depuis ReparateurPanel, false si depuis OwnerPanel
+	 */
+	public void showGestionAppareils(UserDAO user, boolean fromReparateurPanel) {
+	    GestionAppareilsPanel panel = new GestionAppareilsPanel(user, this, fromReparateurPanel);
 	    contentPane.add(panel, "gestionAppareils");
 	    cardLayout.show(contentPane, "gestionAppareils");
+	}
+	
+	/**
+	 * Affiche la gestion du stock d'appareils (surcharge pour compatibilité)
+	 */
+	public void showGestionAppareils(UserDAO user) {
+		// Par défaut, déterminer depuis quel panel selon le type d'utilisateur
+		boolean fromReparateurPanel = user instanceof dao.ReparateurDAO;
+		showGestionAppareils(user, fromReparateurPanel);
 	}
 }

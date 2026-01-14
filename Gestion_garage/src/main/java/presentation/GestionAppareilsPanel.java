@@ -18,10 +18,12 @@ public class GestionAppareilsPanel extends JPanel {
 	private GestionReparation gestion;
 	private UserDAO user;
 	private MainWindow mainWindow;
+	private boolean fromReparateurPanel;  // Indique si on vient du ReparateurPanel
 
-	public GestionAppareilsPanel(UserDAO user, MainWindow mainWindow) {
+	public GestionAppareilsPanel(UserDAO user, MainWindow mainWindow, boolean fromReparateurPanel) {
 		this.user = user;
 		this.mainWindow = mainWindow;
+		this.fromReparateurPanel = fromReparateurPanel;
 		this.gestion = new GestionReparation();
 		
 		setLayout(null);
@@ -187,9 +189,12 @@ public class GestionAppareilsPanel extends JPanel {
 		btnRefresh.addActionListener(e -> refreshTable());
 		
 		btnRetourHeader.addActionListener(e -> {
-			if (user instanceof dao.ReparateurDAO) {
-				mainWindow.showReparateurPanel((dao.ReparateurDAO) user);
+			// Utiliser fromReparateurPanel pour déterminer où retourner
+			if (fromReparateurPanel) {
+				// Vient de ReparateurPanel → retourner au ReparateurPanel
+				mainWindow.showReparateurPanel(user);
 			} else {
+				// Vient de OwnerPanel → retourner au OwnerPanel
 				mainWindow.showOwnerPanel(user);
 			}
 		});

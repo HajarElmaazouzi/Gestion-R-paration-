@@ -23,12 +23,14 @@ public class MesReparateursPanel extends JPanel {
 	private DefaultTableModel model;
 	private GestionUtilisateur gestion;   // service métier
 	private List<ReparateurDAO> reparateurs;
+	private UserDAO owner;  // Stocker le propriétaire connecté
 
 
 	/**
 	 * Create the panel.
 	 */
 	public MesReparateursPanel(UserDAO owner , MainWindow mainWindow) {
+		this.owner = owner;  // Stocker le propriétaire
 		setLayout(null);
 		setBackground(new Color(240, 248, 255));
 		gestion = new GestionUtilisateur();
@@ -216,7 +218,14 @@ public class MesReparateursPanel extends JPanel {
 		            return this;
 		        }
 		    });
-		    List<BoutiqueDAO> boutiques = new GestionBoutique().afficherBoutique();
+		    // Charger seulement les boutiques du propriétaire connecté
+		    GestionBoutique gestionBoutique = new GestionBoutique();
+		    List<BoutiqueDAO> boutiques;
+		    if (owner instanceof dao.Proprietaire) {
+		    	boutiques = gestionBoutique.afficherBoutiquesParProprietaire((dao.Proprietaire) owner);
+		    } else {
+		    	boutiques = gestionBoutique.afficherBoutique();
+		    }
 		    for (BoutiqueDAO b : boutiques) {
 		        boutiqueCombo.addItem(b);
 		    }
@@ -342,7 +351,13 @@ public class MesReparateursPanel extends JPanel {
 	
 	private void refreshTable() {
 	    model.setRowCount(0);
-	    reparateurs = gestion.ListerReparateurs();
+	    // Filtrer les réparateurs par le propriétaire connecté
+	    if (owner instanceof dao.Proprietaire) {
+	    	GestionBoutique gestionBoutique = new GestionBoutique();
+	    	reparateurs = gestionBoutique.listerReparateursParProprietaire((dao.Proprietaire) owner);
+	    } else {
+	    	reparateurs = gestion.ListerReparateurs();
+	    }
 	    if (reparateurs != null) {
 	        for (ReparateurDAO r : reparateurs) {
 	            model.addRow(new Object[]{r.getId(), r.getUsername(), r.getPourcentage() + "%"});

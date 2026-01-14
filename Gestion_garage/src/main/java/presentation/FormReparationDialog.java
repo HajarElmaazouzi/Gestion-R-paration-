@@ -40,10 +40,8 @@ public class FormReparationDialog extends JDialog {
 	public FormReparationDialog(MainWindow mainWindow, UserDAO user, Reparation reparation) {
 		super(mainWindow, reparation == null ? "✨ Créer une Réparation" : "✏️ Modifier la Réparation", true);
 		
-		// Vérification de sécurité: Seuls les réparateurs peuvent créer/modifier des réparations
-		if (!(user instanceof ReparateurDAO)) {
-			throw new IllegalArgumentException("Seuls les réparateurs peuvent créer/modifier des réparations");
-		}
+		// Permettre aux réparateurs ET aux propriétaires (quand ils sont en mode réparateur)
+		// Les propriétaires peuvent aussi créer des réparations
 		
 		this.mainWindow = mainWindow;
 		this.user = user;
@@ -335,10 +333,22 @@ public class FormReparationDialog extends JDialog {
 		});
 	}
 	
+	/**
+	 * Parse un nombre en gérant les formats avec virgule (français) et point (anglais)
+	 */
+	private Double parseDoubleLocalized(String text) {
+		if (text == null || text.trim().isEmpty()) {
+			return 0.0;
+		}
+		// Remplacer la virgule par un point pour le parsing
+		String normalized = text.trim().replace(',', '.');
+		return Double.parseDouble(normalized);
+	}
+	
 	private void calculerReste() {
 		try {
-			Double coutTotal = Double.parseDouble(txtCoutTotal.getText().trim());
-			Double avance = Double.parseDouble(txtAvance.getText().trim());
+			Double coutTotal = parseDoubleLocalized(txtCoutTotal.getText());
+			Double avance = parseDoubleLocalized(txtAvance.getText());
 			Double reste = Math.max(0.0, coutTotal - avance);
 			lblReste.setText(String.format("%.2f", reste));
 		} catch (NumberFormatException e) {
@@ -474,8 +484,8 @@ public class FormReparationDialog extends JDialog {
 			return false;
 		}
 		try {
-			Double.parseDouble(txtCoutTotal.getText().trim());
-			Double.parseDouble(txtAvance.getText().trim());
+			parseDoubleLocalized(txtCoutTotal.getText());
+			parseDoubleLocalized(txtAvance.getText());
 		} catch (NumberFormatException e) {
 			JOptionPane.showMessageDialog(this, "Le cout total et l'avance doivent etre des nombres valides", "Erreur", JOptionPane.ERROR_MESSAGE);
 			return false;
@@ -491,10 +501,10 @@ public class FormReparationDialog extends JDialog {
 				nouvelle.setClient(txtClient.getText().trim());
 				nouvelle.setTelephone(txtTelephone.getText().trim());
 				nouvelle.setDescription(txtDescription.getText().trim());
-				nouvelle.setCoutTotal(Double.parseDouble(txtCoutTotal.getText().trim()));
-				nouvelle.setAvance(Double.parseDouble(txtAvance.getText().trim()));
+				nouvelle.setCoutTotal(parseDoubleLocalized(txtCoutTotal.getText()));
+				nouvelle.setAvance(parseDoubleLocalized(txtAvance.getText()));
 				calculerReste();
-				nouvelle.setReste(Double.parseDouble(lblReste.getText()));
+				nouvelle.setReste(parseDoubleLocalized(lblReste.getText()));
 				nouvelle.setPhotoPath(photoPath);
 				nouvelle.setReparateur(user);
 				nouvelle.setAppareils(new ArrayList<>());
@@ -513,10 +523,10 @@ public class FormReparationDialog extends JDialog {
 				modif.setClient(txtClient.getText().trim());
 				modif.setTelephone(txtTelephone.getText().trim());
 				modif.setDescription(txtDescription.getText().trim());
-				modif.setCoutTotal(Double.parseDouble(txtCoutTotal.getText().trim()));
-				modif.setAvance(Double.parseDouble(txtAvance.getText().trim()));
+				modif.setCoutTotal(parseDoubleLocalized(txtCoutTotal.getText()));
+				modif.setAvance(parseDoubleLocalized(txtAvance.getText()));
 				calculerReste();
-				modif.setReste(Double.parseDouble(lblReste.getText()));
+				modif.setReste(parseDoubleLocalized(lblReste.getText()));
 				if (photoPath != null && !photoPath.isEmpty()) {
 					modif.setPhotoPath(photoPath);
 				}

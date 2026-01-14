@@ -7,6 +7,8 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
@@ -27,6 +29,13 @@ public class BoutiqueDAO {
 	private int id ;
     private String Nom;
     private String Adresse;
+    
+    // Relation avec le Proprietaire (chaque boutique appartient à un propriétaire)
+    // nullable = true temporairement pour les boutiques existantes sans propriétaire
+    @ManyToOne
+    @JoinColumn(name = "proprietaire_id", nullable = true)
+    private Proprietaire proprietaire;
+    
 	@OneToMany(mappedBy = "boutique" , fetch = javax.persistence.FetchType.LAZY , cascade = CascadeType.REMOVE, orphanRemoval = true) 
 	List<ReparateurDAO> reparateurs ;
 	
