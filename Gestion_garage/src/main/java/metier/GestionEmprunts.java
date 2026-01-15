@@ -71,7 +71,7 @@ public class GestionEmprunts implements IGestionEmprunts {
                 CaisseDAO caissePreteur = em.createQuery(
                         "SELECT c FROM CaisseDAO c WHERE c.user.id = :userId", 
                         CaisseDAO.class)
-                        .setParameter("userId", preteurId)
+                        .setParameter("userId", preteurId != null ? (long)preteurId : null)
                         .getResultStream()
                         .findFirst()
                         .orElse(null);
@@ -98,7 +98,7 @@ public class GestionEmprunts implements IGestionEmprunts {
                 CaisseDAO caisseEmprunteur = em.createQuery(
                         "SELECT c FROM CaisseDAO c WHERE c.user.id = :userId", 
                         CaisseDAO.class)
-                        .setParameter("userId", emprunteurId)
+                        .setParameter("userId", (long)emprunteurId)
                         .getResultStream()
                         .findFirst()
                         .orElse(null);
@@ -162,7 +162,7 @@ public class GestionEmprunts implements IGestionEmprunts {
                 CaisseDAO caisseEmprunteur = em.createQuery(
                         "SELECT c FROM CaisseDAO c WHERE c.user.id = :userId", 
                         CaisseDAO.class)
-                        .setParameter("userId", emprunt.getEmprunteur().getId().intValue())
+                        .setParameter("userId", emprunt.getEmprunteur().getId())
                         .getResultStream()
                         .findFirst()
                         .orElse(null);
@@ -190,7 +190,7 @@ public class GestionEmprunts implements IGestionEmprunts {
                 CaisseDAO caisseEmprunteur = em.createQuery(
                         "SELECT c FROM CaisseDAO c WHERE c.user.id = :userId", 
                         CaisseDAO.class)
-                        .setParameter("userId", emprunt.getEmprunteur().getId().intValue())
+                        .setParameter("userId", emprunt.getEmprunteur().getId())
                         .getResultStream()
                         .findFirst()
                         .orElse(null);
@@ -217,7 +217,7 @@ public class GestionEmprunts implements IGestionEmprunts {
                 CaisseDAO caissePreteur = em.createQuery(
                         "SELECT c FROM CaisseDAO c WHERE c.user.id = :userId", 
                         CaisseDAO.class)
-                        .setParameter("userId", emprunt.getPreteur().getId().intValue())
+                        .setParameter("userId", emprunt.getPreteur().getId())
                         .getResultStream()
                         .findFirst()
                         .orElse(null);
@@ -256,7 +256,7 @@ public class GestionEmprunts implements IGestionEmprunts {
             List<EmpruntDAO> emprunts = em.createQuery(
                     "SELECT e FROM EmpruntDAO e WHERE e.emprunteur.id = :userId ORDER BY e.date DESC", 
                     EmpruntDAO.class)
-                    .setParameter("userId", userId)
+                    .setParameter("userId", (long)userId)
                     .getResultList();
             
             System.out.println("📋 Nombre d'emprunts trouvés: " + emprunts.size());
@@ -274,7 +274,7 @@ public class GestionEmprunts implements IGestionEmprunts {
             List<EmpruntDAO> emprunts = em.createQuery(
                     "SELECT e FROM EmpruntDAO e WHERE e.emprunteur.id = :userId AND e.statut = :statut ORDER BY e.date DESC", 
                     EmpruntDAO.class)
-                    .setParameter("userId", userId)
+                    .setParameter("userId", (long)userId)
                     .setParameter("statut", StatutEmprunt.EN_COURS)
                     .getResultList();
             

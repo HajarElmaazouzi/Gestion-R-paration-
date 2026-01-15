@@ -21,7 +21,7 @@ public class EmpruntDAO {
     
     @Column(name = "date_emprunt")
     @Temporal(TemporalType.TIMESTAMP)
-    private Date date = new Date();
+    private Date date;
     
     @Column(name = "description", columnDefinition = "TEXT")
     private String description;
@@ -45,6 +45,14 @@ public class EmpruntDAO {
     @Column(name = "date_remboursement")
     @Temporal(TemporalType.TIMESTAMP)
     private Date dateRemboursement;
+    
+    // ====== INITIALISATION ======
+    @PrePersist
+    public void init() {
+        if (date == null) {
+            date = new Date();
+        }
+    }
     
     public enum StatutEmprunt {
         EN_COURS,

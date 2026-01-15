@@ -139,4 +139,15 @@ public class MainWindow extends JFrame {
 		boolean fromReparateurPanel = user instanceof dao.ReparateurDAO;
 		showGestionAppareils(user, fromReparateurPanel);
 	}
+	
+	// ========== MÉTHODES POUR GESTION EMPRUNTS ==========
+	
+	/**
+	 * Affiche la gestion des emprunts
+	 */
+	public void showGestionEmprunts(UserDAO user) {
+		GestionEmpruntsPanel panel = new GestionEmpruntsPanel(user, this);
+		contentPane.add(panel, "gestionEmprunts");
+		cardLayout.show(contentPane, "gestionEmprunts");
+	}
 }

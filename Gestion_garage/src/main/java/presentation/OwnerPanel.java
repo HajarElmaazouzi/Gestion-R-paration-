@@ -98,8 +98,12 @@ public class OwnerPanel extends JPanel {
 		btnStockAppareils.setBounds(10, 200, 160, 50);
 		sidebarPanel.add(btnStockAppareils);
 		
+		JButton btnEmprunts = createSidebarButton("💰 Emprunts", new Color(230, 126, 34));
+		btnEmprunts.setBounds(10, 260, 160, 50);
+		sidebarPanel.add(btnEmprunts);
+		
 		JButton btnRefresh = createSidebarButton("🔄 Actualiser", new Color(127, 140, 141));
-		btnRefresh.setBounds(10, 260, 160, 50);
+		btnRefresh.setBounds(10, 320, 160, 50);
 		sidebarPanel.add(btnRefresh);
 		
 		// ========== TABLEAU DES RÉPARATEURS ==========
@@ -178,6 +182,10 @@ public class OwnerPanel extends JPanel {
 		
 		btnStockAppareils.addActionListener(e -> {
 			mainWindow.showGestionAppareils(owner, false);  // false = vient de OwnerPanel
+		});
+		
+		btnEmprunts.addActionListener(e -> {
+			mainWindow.showGestionEmprunts(owner);
 		});
 		
 		btnRefresh.addActionListener(e -> {

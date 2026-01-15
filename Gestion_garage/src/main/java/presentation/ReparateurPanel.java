@@ -78,6 +78,10 @@ public class ReparateurPanel extends JPanel {
 		btnGererAppareils.setBounds(10, 90, 160, 60);
 		sidebarPanel.add(btnGererAppareils);
 		
+		JButton btnEmprunts = createSidebarButton("💰 Emprunts", new Color(230, 126, 34));
+		btnEmprunts.setBounds(10, 160, 160, 60);
+		sidebarPanel.add(btnEmprunts);
+		
 		// Panel de bienvenue au centre
 		JPanel welcomePanel = new JPanel(null) {
 			@Override
@@ -111,7 +115,8 @@ public class ReparateurPanel extends JPanel {
 			"<p style='font-size: 14px; color: #95a5a6; margin-top: 20px;'>" +
 			"Utilisez les boutons à gauche pour accéder aux différentes fonctionnalités :<br><br>" +
 			"• <b>Mes Réparations</b> : Gérez vos réparations en cours<br>" +
-			"• <b>Stock Appareils</b> : Consultez et gérez le stock d'appareils</p>" +
+			"• <b>Stock Appareils</b> : Consultez et gérez le stock d'appareils<br>" +
+			"• <b>Emprunts</b> : Gérez vos emprunts et remboursements</p>" +
 			"</div></html>");
 		lblInfo.setBounds(50, 100, 580, 300);
 		welcomePanel.add(lblInfo);
@@ -124,6 +129,10 @@ public class ReparateurPanel extends JPanel {
 		
 		btnGererAppareils.addActionListener(e -> {
 			mainWindow.showGestionAppareils(user, true);  // true = vient de ReparateurPanel
+		});
+		
+		btnEmprunts.addActionListener(e -> {
+			mainWindow.showGestionEmprunts(user);
 		});
 		
 		btnLogout.addActionListener(e -> {
